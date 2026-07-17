@@ -1,0 +1,1107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#1a3a3a" />
+  <title>Ashitha — Interview Practice</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,650&family=Source+Sans+3:wght@400;600;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #f3f0ea; --bg2: #fffdf9; --ink: #1c2424; --muted: #5a6666; --line: #d5d0c6;
+      --a: #1a3a3a; --b: #6b2e36; --c: #2d5a3d; --n: #3d2f5a; --accent: #1a3a3a; --voice: #8a5a20;
+      --radius: 14px; --font: "Source Sans 3", system-ui, sans-serif; --display: "Fraunces", Georgia, serif;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0; font-family: var(--font); color: var(--ink);
+      background:
+        radial-gradient(ellipse 80% 40% at 10% -10%, #dfecea 0%, transparent 55%),
+        radial-gradient(ellipse 60% 30% at 100% 0%, #ebe4dc 0%, transparent 50%), var(--bg);
+      line-height: 1.45; min-height: 100dvh; padding-bottom: 88px;
+    }
+    header.app {
+      position: sticky; top: 0; z-index: 20;
+      background: color-mix(in srgb, var(--bg2) 92%, transparent);
+      backdrop-filter: blur(10px); border-bottom: 1px solid var(--line); padding: 14px 16px 10px;
+    }
+    header.app h1 { font-family: var(--display); font-size: 1.35rem; font-weight: 650; margin: 0; }
+    header.app p { margin: 4px 0 0; color: var(--muted); font-size: 0.88rem; }
+    main { max-width: 720px; margin: 0 auto; padding: 16px; }
+    nav.tabs { display: flex; gap: 8px; overflow-x: auto; padding: 4px 0 8px; }
+    nav.tabs button, .pick button {
+      flex: 0 0 auto; border: 1px solid var(--line); background: var(--bg2); color: var(--ink);
+      border-radius: 999px; padding: 8px 14px; font: inherit; font-weight: 600; font-size: 0.9rem; cursor: pointer;
+    }
+    nav.tabs button.active, .pick button.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+    .pick { display: flex; gap: 8px; flex-wrap: wrap; margin: 0 0 12px; }
+    .panel { display: none; } .panel.active { display: block; }
+    .card { background: var(--bg2); border: 1px solid var(--line); border-radius: var(--radius); padding: 16px; margin-bottom: 12px; }
+    .card h2, .card h3 { font-family: var(--display); margin: 0 0 8px; font-weight: 650; }
+    .card h2 { font-size: 1.25rem; } .card h3 { font-size: 1.05rem; }
+    .muted { color: var(--muted); font-size: 0.92rem; }
+    .para { font-size: 1.08rem; line-height: 1.6; }
+    .para strong { font-weight: 700; background: color-mix(in srgb, var(--accent) 12%, transparent); padding: 0 2px; border-radius: 3px; }
+    .pill { display: inline-block; font-size: 0.75rem; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; padding: 4px 8px; border-radius: 6px; margin-bottom: 10px; color: #fff; }
+    .pill.a { background: var(--a); } .pill.b { background: var(--b); } .pill.c { background: var(--c); } .pill.n { background: var(--n); }
+    .voice-box {
+      border: 1px dashed color-mix(in srgb, var(--voice) 45%, var(--line));
+      background: color-mix(in srgb, var(--voice) 8%, var(--bg2));
+      border-radius: 12px; padding: 12px 14px; margin: 12px 0;
+    }
+    .voice-box .label { font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--voice); margin-bottom: 6px; }
+    .voice-box p { margin: 0; font-size: 0.95rem; }
+    .voice-box ul { margin: 6px 0 0; padding-left: 1.1rem; font-size: 0.92rem; }
+    .row { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 14px; }
+    button.btn { border: 1px solid var(--line); background: var(--bg2); color: var(--ink); border-radius: 10px; padding: 10px 14px; font: inherit; font-weight: 600; cursor: pointer; }
+    button.btn.primary { background: var(--accent); color: #fff; border-color: var(--accent); }
+    button.btn:disabled { opacity: 0.45; }
+    .progress { height: 6px; background: var(--line); border-radius: 99px; overflow: hidden; margin: 10px 0 4px; }
+    .progress > span { display: block; height: 100%; background: var(--accent); width: 0%; transition: width .2s ease; }
+    .step-label { font-size: 0.85rem; color: var(--muted); }
+    .hint { border-left: 3px solid var(--accent); padding-left: 12px; margin: 12px 0; color: var(--muted); font-size: 0.95rem; }
+    .mode-row { display: flex; gap: 6px; flex-wrap: wrap; margin: 10px 0 0; }
+    .mode-row button { border: 1px solid var(--line); background: var(--bg); border-radius: 8px; padding: 7px 10px; font: inherit; font-size: 0.85rem; font-weight: 600; cursor: pointer; }
+    .mode-row button.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+    .flip { min-height: 200px; cursor: pointer; user-select: none; margin-top: 12px; }
+    .flip .label { font-size: 0.8rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); margin-bottom: 8px; }
+    .home-grid { display: grid; gap: 10px; grid-template-columns: 1fr 1fr; }
+    @media (max-width: 520px) { .home-grid { grid-template-columns: 1fr; } }
+    .home-tile { text-align: left; border: 1px solid var(--line); background: var(--bg2); border-radius: var(--radius); padding: 14px; font: inherit; cursor: pointer; }
+    .home-tile .kicker { font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; color: var(--muted); }
+    .home-tile .title { font-family: var(--display); font-size: 1.1rem; font-weight: 650; margin-top: 4px; }
+    footer.bar {
+      position: fixed; left: 0; right: 0; bottom: 0; background: var(--bg2); border-top: 1px solid var(--line);
+      padding: 10px 16px calc(10px + env(safe-area-inset-bottom)); display: flex; justify-content: center; gap: 8px; z-index: 30;
+    }
+    footer.bar button { flex: 1; max-width: 180px; }
+    ul.clean { margin: 8px 0 0; padding-left: 1.1rem; }
+    ul.clean li { margin: 6px 0; }
+    .legend { font-size: 0.88rem; color: var(--muted); margin-top: 8px; }
+    .q-acc {
+      width: 100%; text-align: left; border: 1px solid var(--line); background: var(--bg2);
+      border-radius: 12px; padding: 12px 14px; margin-bottom: 8px; font: inherit; cursor: pointer;
+    }
+    .q-acc .q-title { font-weight: 700; font-size: 1rem; }
+    .q-acc .q-chev { float: right; color: var(--muted); font-weight: 700; }
+    .q-acc.open { border-color: var(--accent); }
+    .q-acc .q-body { display: none; margin-top: 12px; text-align: left; }
+    .q-acc.open .q-body { display: block; }
+    .q-acc .q-label {
+      font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em;
+      color: var(--muted); margin: 10px 0 4px;
+    }
+    .section-h {
+      font-family: var(--display); font-size: 1.05rem; font-weight: 650; margin: 18px 0 8px;
+    }
+    .search-input {
+      width: 100%; margin-top: 10px; border: 1px solid var(--line); border-radius: 10px;
+      padding: 10px 12px; font: inherit; background: #fff; color: var(--ink);
+    }
+    .acro-row {
+      display: grid; grid-template-columns: minmax(5.5rem, auto) 1fr; gap: 8px 12px;
+      padding: 10px 0; border-bottom: 1px solid var(--line); font-size: 0.98rem;
+    }
+    .acro-row:last-child { border-bottom: 0; padding-bottom: 0; }
+    .acro-abbr {
+      font-weight: 700; color: var(--accent); letter-spacing: 0.02em;
+    }
+    .acro-def { color: var(--ink); line-height: 1.45; }
+    .acro-empty { color: var(--muted); font-size: 0.95rem; margin: 8px 0 0; }
+    .timer-row {
+      display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-top: 12px;
+    }
+    .timer-display {
+      font-family: var(--display); font-weight: 650; font-size: 1.35rem; min-width: 3.5rem;
+    }
+    .timer-display.warn { color: #6b2e36; }
+  </style>
+</head>
+<body>
+  <header class="app">
+    <h1>Ashitha · Interview practice</h1>
+    <p>Band 6 Specialist Research Nurse — Oncology / Haematology · PHU</p>
+    <nav class="tabs" id="tabs"></nav>
+  </header>
+
+  <main>
+    <section class="panel active" data-panel="home">
+      <div class="card">
+        <h2>How to use</h2>
+        <ol class="clean">
+          <li>Pick an answer below.</li>
+          <li>Read the yellow box first — that’s how to say it.</li>
+          <li><strong>Bold words</strong> = say a bit slower / stronger.</li>
+          <li>Quiz has three steps: Question → Short hooks → Full answer.</li>
+          <li><strong>Nurse cards</strong> = consent / SAE checklists. <strong>Acronyms</strong> = onc/haem & trial words.</li>
+        </ol>
+        <div class="hint">Don’t make up numbers. Don’t say you can give chemo / SACT yet. Acronyms are for learning only.</div>
+      </div>
+      <div class="home-grid" id="homeGrid"></div>
+    </section>
+
+    <section class="panel" data-panel="script">
+      <div class="pick" id="scriptPick"></div>
+      <div class="card">
+        <div id="scriptPill" class="pill a">A</div>
+        <h2 id="scriptTitle">Answer A</h2>
+        <p class="muted" id="scriptMeta"></p>
+        <div class="voice-box" id="scriptVoiceOverall"></div>
+        <div class="progress"><span id="scriptBar"></span></div>
+        <div class="step-label" id="scriptStep"></div>
+        <div class="voice-box" id="scriptVoicePara"></div>
+        <div class="para" id="scriptPara" style="margin-top:12px"></div>
+        <p class="legend">Bold = stress this. Short pause after each full stop.</p>
+        <div class="row">
+          <button class="btn" id="scriptPrev" type="button">Previous</button>
+          <button class="btn primary" id="scriptNext" type="button">Next</button>
+          <button class="btn" id="scriptAll" type="button">Show all</button>
+        </div>
+      </div>
+      <div class="card" id="scriptFullWrap" hidden>
+        <h3>Full answer</h3>
+        <div class="para" id="scriptFull"></div>
+      </div>
+    </section>
+
+    <section class="panel" data-panel="questions">
+      <div class="card">
+        <h2>Question quiz</h2>
+        <p class="muted">Tap Flip: Question → Short points → Full answer. Optional ~90s timer for practice answers.</p>
+        <div class="mode-row" id="qModes">
+          <button type="button" data-mode="0" class="active">1 · Question</button>
+          <button type="button" data-mode="1">2 · Short points</button>
+          <button type="button" data-mode="2">3 · Q + answer</button>
+        </div>
+        <div class="flip card" id="qFlip" style="border-style:dashed;">
+          <div class="label" id="qSide">Question</div>
+          <div class="para" id="qText"></div>
+          <div class="voice-box" id="qVoice" hidden></div>
+        </div>
+        <div class="timer-row">
+          <span class="timer-display" id="qTimer">1:30</span>
+          <button class="btn primary" id="qTimerStart" type="button">Start 90s</button>
+          <button class="btn" id="qTimerReset" type="button">Reset</button>
+        </div>
+        <div class="row">
+          <button class="btn" id="qPrev" type="button">Previous</button>
+          <button class="btn primary" id="qFlipBtn" type="button">Flip</button>
+          <button class="btn" id="qNext" type="button">Next Q</button>
+        </div>
+        <p class="muted" id="qCount" style="margin-top:10px"></p>
+      </div>
+      <div class="card">
+        <h3>Filter</h3>
+        <div class="row" id="qFilters"></div>
+      </div>
+    </section>
+
+    <section class="panel" data-panel="voice">
+      <div class="pick" id="voicePick"></div>
+      <div class="card" id="voiceDynamic"></div>
+      <div class="card">
+        <h2>Simple speaking rules</h2>
+        <ul class="clean">
+          <li>Talk a bit <strong>slower</strong> than normal — like giving a calm handover.</li>
+          <li><strong>Bold words</strong>: slow down a tiny bit there.</li>
+          <li>Stop for half a second after full stops.</li>
+          <li>On hard honesty bits: softer voice, not sorry, not angry.</li>
+          <li>On leadership bits: clear and steady — “this is what I do”.</li>
+          <li>At the end: finish the last line, then <strong>stop</strong>. Don’t add “yeah…” or “so…”.</li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="panel" data-panel="bank">
+      <div class="card">
+        <h2>All questions</h2>
+        <p class="muted">Tap a question to open it. You’ll see the question and a full spoken answer together.</p>
+      </div>
+      <div id="bankList"></div>
+    </section>
+
+    <section class="panel" data-panel="tips">
+      <div class="card">
+        <h2>WhatsApp picture order</h2>
+        <ul class="clean">
+          <li><strong>A1–A6</strong> About yourself</li>
+          <li><strong>B1–B5</strong> Why appoint you</li>
+          <li><strong>C1–C6</strong> CRAAFT story</li>
+          <li><strong>N1–N5</strong> Night in charge story</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h2>On the website too</h2>
+        <ul class="clean">
+          <li><strong>Nurse cards</strong> — consent + SAE order + do-not-say</li>
+          <li><strong>Acronyms</strong> — SACT, SAE, RECIST, AML… (literacy only)</li>
+          <li><strong>Quiz</strong> — Flip answers + optional 90s timer</li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="panel" data-panel="nurse">
+      <div class="card">
+        <h2>Research nurse quick cards</h2>
+        <p class="muted">Short checklists for interview answers that sound “proper research”.</p>
+      </div>
+      <div class="card">
+        <h3>Consent — say these points</h3>
+        <ul class="clean">
+          <li>Capacity / understanding</li>
+          <li>Approved PIS + consent form only</li>
+          <li>On the delegation log for that study</li>
+          <li>What / why / risks / benefits / options</li>
+          <li>Voluntary + can withdraw; care continues either way</li>
+          <li>Time to decide; check understanding</li>
+          <li>Document; escalate to PI if unsure</li>
+          <li>Never pressure</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>SAE — order to say</h3>
+        <ol class="clean">
+          <li>Patient safety / clinical help first</li>
+          <li>Tell the PI straight away</li>
+          <li>Is it serious? (hospital / life-threatening / etc. per protocol)</li>
+          <li>Report within protocol / Trust timelines</li>
+          <li>Document clearly</li>
+          <li>Follow up and learn with the team</li>
+        </ol>
+      </div>
+      <div class="card">
+        <h3>Do not say</h3>
+        <ul class="clean">
+          <li>Made-up recruitment numbers</li>
+          <li>“I can give chemo / SACT already”</li>
+          <li>“I run the study” sounding like you are the PI (say <strong>lead local delivery</strong>)</li>
+          <li>“I’ve never done research / trials”</li>
+          <li>Promising a date you’ll be chemo competent</li>
+          <li>Criticising current team / specialty</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>Questions to ask them</h3>
+        <ul class="clean">
+          <li>What does the current onc/haem portfolio look like?</li>
+          <li>What SACT / chemo competence is expected in the first 6–12 months?</li>
+          <li>How is line management / APDR set up?</li>
+          <li>How do you balance specialty work with Hub / IOW cover?</li>
+          <li>What does good look like at 3 months and 12 months?</li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="panel" data-panel="acronyms">
+      <div class="card">
+        <h2>Oncology &amp; research acronyms</h2>
+        <p class="muted">Interview literacy only. Knowing the word is <strong>not</strong> the same as being SACT / chemo competent.</p>
+        <input class="search-input" type="search" id="acroSearch" placeholder="Search e.g. SAE, SACT, RECIST, AML…" autocomplete="off" />
+        <p class="muted" id="acroCount" style="margin-top:8px"></p>
+      </div>
+      <div id="acroList"></div>
+    </section>
+  </main>
+
+  <footer class="bar">
+    <button class="btn" type="button" data-go="home">Home</button>
+    <button class="btn primary" type="button" data-go="questions">Quiz</button>
+    <button class="btn" type="button" data-go="voice">Voice</button>
+  </footer>
+
+  <script>
+    function md(s) {
+      return String(s)
+        .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
+        .replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>")
+        .replace(/\n\n/g, "<br><br>").replace(/\n/g, "<br>");
+    }
+
+    const ACCENT = { a: "#1a3a3a", b: "#6b2e36", c: "#2d5a3d", n: "#3d2f5a" };
+
+    const SCRIPTS = {
+      A: {
+        code: "A", pill: "a", title: "Tell us about yourself",
+        meta: "About 1.5 minutes · everyday language",
+        voiceOverall: {
+          label: "How to sound — Answer A",
+          html: "<p>Sound warm and clear — like you’re introducing yourself to a new team.</p><ul><li>Smile a little at the start.</li><li>Slow down on <strong>lead local delivery of CRAAFT-HF</strong> and <strong>Band 6</strong>.</li><li>Sound keen when you talk about cancer research.</li><li>Finish the last line, then stop talking.</li></ul>"
+        },
+        paras: [
+          {
+            text: "Good morning. My name is **Ashitha George**. I’m a **Band 5 Clinical Research Nurse** at **Portsmouth Hospitals**.",
+            voice: "Friendly and clear. Say your name and job steadily — don’t rush."
+          },
+          {
+            text: "I’ve been in research since **December 2024**. I work in the **Research Hub** about **two days** a week, and in **Cardiology** research about **three days** a week. Across both, I help with about **ten studies**.",
+            voice: "Just facts. Pause after ‘ten studies’."
+          },
+          {
+            text: "Day to day I help find patients for studies, take **informed consent**, run study visits on my own, do **bloods**, ECGs, record **adverse events**, fill in CRFs and look after samples. I work to **Good Clinical Practice**. In Cardiology I **lead local delivery of CRAAFT-HF** — a heart-failure study comparing AF ablation with medicines — working with the PI. I also help with commercial trials and registry studies. In the Hub I’ve done blinded vaccine visits, and helped set up a Phase I vaccine study.",
+            voice: "This one is longer — breathe in the middle. Really stress **lead local delivery of CRAAFT-HF**. That’s your big point."
+          },
+          {
+            text: "Before research I was a staff nurse on **Respiratory E8** for nearly four years. I often worked as **night Nurse in Charge** — beds, admissions, discharges, and leading the team when it was busy. I’ve mentored students and juniors, and I did the **Aspire** and **Beyond Boundaries** leadership programmes.",
+            voice: "Sound proud but normal. Stress night in charge and Beyond Boundaries."
+          },
+          {
+            text: "I’m applying for this **Band 6** job in **Oncology and Haematology** because I want the next step. I want to **lead local delivery** of cancer research studies more, help junior staff, and learn **oncology and chemo skills** with proper **training**. I care about face-to-face research with patients, and I want to grow in **cancer research**.",
+            voice: "This is your ‘why’. Warm. Slow on Band 6 and Oncology. Soften ‘chemo skills’ — you’re keen to learn, not saying you can do it now."
+          },
+          {
+            text: "I’m an **internal** candidate, so I already know how research works here. I can stay flexible for Hub or Trust-wide work when needed, and still build up in Oncology. That’s why this feels like the **right next step**, and somewhere I can help **from day one** while I keep learning.",
+            voice: "Confident close. Stress internal and from day one. Then stop."
+          }
+        ]
+      },
+      B: {
+        code: "B", pill: "b", title: "Why appoint you (no chemo yet)",
+        meta: "About 1–1.5 minutes · honest and clear",
+        voiceOverall: {
+          label: "How to sound — Answer B",
+          html: "<p>Be honest first. Then sound strong about what you *can* do. Don’t sound sorry.</p><ul><li>First bit: quieter, calm — ‘I don’t do chemo yet’.</li><li>Next bit: stronger — ‘what I *do* bring’.</li><li>Learning plan: like listing a simple to-do list.</li><li>Last line: firm — patient safety first — then stop.</li></ul>"
+        },
+        paras: [
+          {
+            text: "That’s a fair question. I’ll be straight with you: I do **not** have **chemo** or **SACT** skills yet, and I wouldn’t pretend I do.",
+            voice: "Calm and honest. Pause after ‘straight with you’. No nervous laugh."
+          },
+          {
+            text: "What I **do** bring is real research experience **here** at this Trust. I help run commercial and NIHR studies safely — finding patients, **consent**, study visits, **bloods**, adverse-event notes and CRF work, to **GCP**. In Cardiology I already **lead local delivery of CRAAFT-HF**, working with the **PI** and the team on screening, consent, visits and day-to-day running. That shows I can take **ownership of delivery at site**, not just do odd jobs.",
+            voice: "Stronger now. Stress ‘do bring’, lead local delivery of CRAAFT-HF, ownership of delivery."
+          },
+          {
+            text: "I also bring solid ward skills from Respiratory E8, including **night Nurse in Charge**. That taught me how to prioritise, make decisions, escalate, and lead a team when it’s busy — which matters in research too when timescales are tight. I’ve done **Aspire** and **Beyond Boundaries**, and I mentor juniors. On the cancer side, through **SAFE-D** I’ve already screened and consented people for a **pancreatic cancer** surveillance study, carefully and kindly.",
+            voice: "Steady. Softer when you mention SAFE-D / cancer chat. Firm on night in charge."
+          },
+          {
+            text: "I’m still a strong candidate because the **job advert** says oncology and chemo skills can be learned with **training**. I’m not looking for a shortcut. If I got the job I’d: spend time with the team early; **shadow** day unit and specialist nurses; finish the Trust **SACT** training in their timeframe; learn each study with the PI; and stay flexible Hub-style while I build up **safely**.",
+            voice: "List the plan slowly. Pause between steps. Stress ‘not a shortcut’ and ‘safely’."
+          },
+          {
+            text: "So you’d be appointing someone who already **delivers research** well here, is ready for **Band 6** work like **leading local study delivery** and helping juniors, is **honest about the gap**, and will learn Oncology properly — with **patient safety first** every time.",
+            voice: "Strong finish. Hit each bold bit. End on patient safety first, then silence."
+          }
+        ]
+      },
+      C: {
+        code: "C", pill: "c", title: "STAR — CRAAFT-HF",
+        meta: "About 1.5–2 minutes · story of leading a study",
+        voiceOverall: {
+          label: "How to sound — CRAAFT story",
+          html: "<p>Sound like you quietly <strong>lead</strong> day-to-day delivery — calm and capable, not braggy, and not like the PI.</p><ul><li>Start clear: ‘I **lead local delivery** of CRAAFT-HF…’</li><li>Middle: practical what-you-do.</li><li>Problem example: solving tone.</li><li>End: link to Band 6 cancer research.</li></ul>"
+        },
+        paras: [
+          {
+            text: "I **lead local delivery of CRAAFT-HF** in Cardiology research. It’s a study looking at AF ablation versus medicines in people with heart failure. That means I help make sure screening, consent, visits and day-to-day site running happen safely under the **PI** — not only doing visits when I’m free.",
+            voice: "Strong start. Slow on CRAAFT-HF. Say ‘local delivery’ so you don’t sound like the PI."
+          },
+          {
+            text: "I cover **screening and recruitment**, help with **informed consent** within what I’m allowed to do, organise visits and time windows, and work with the **PI** and the **MDT** so the right patients are found safely and we don’t miss protocol steps.",
+            voice: "Simple list. Tiny pause after each bold bit."
+          },
+          {
+            text: "In practice I work with clinics and wards to find possible patients, check they’re eligible with the clinical team, and speak to them at a good time. I explain things clearly and slowly so consent is real. People can ask questions, take time, or **say no** — and that is always **respected**.",
+            voice: "Softer on say no / respected. Shows you put patients first."
+          },
+          {
+            text: "I also keep track of visits and what’s outstanding, and work around the patient’s heart-failure care so research stays safe. Writing up is to **GCP**. If there’s a problem, or a visit window might be missed, I **escalate early** to the PI or senior research nurses — I don’t wait until it’s already gone wrong.",
+            voice: "Firm on escalate early."
+          },
+          {
+            text: "For example, when timing is tight because clinics clash or we’re waiting on another team, I make clear who does what next, keep the PI updated, and agree a **safe plan** together — so we don’t approach people wrongly or **rush** the study steps.",
+            voice: "Story voice. Swap in a real example if you have one. Stress safe plan / don’t rush."
+          },
+          {
+            text: "So CRAAFT-HF runs in a joined-up, patient-centred way: we look ahead, consent carefully, and escalate early. That’s the **local delivery ownership** I’d bring to a **Band 6 Oncology portfolio** — coordinating studies carefully with the PI, with **safety** and **GCP** first.",
+            voice: "Link to the job. Stress Band 6 and safety. Then stop."
+          }
+        ]
+      },
+      N: {
+        code: "N", pill: "n", title: "STAR — Night in charge",
+        meta: "About 1.5–2 minutes · busy night story",
+        voiceOverall: {
+          label: "How to sound — Night in charge",
+          html: "<p>Calm under pressure. Don’t dramatise the night.</p><ul><li>Set the scene briefly.</li><li>Stress prioritise / delegate / escalate.</li><li>End by linking it to research Band 6 work.</li></ul>"
+        },
+        paras: [
+          {
+            text: "On Respiratory **E8** — a busy **36-bed** ward — I often worked as **night Nurse in Charge**. A typical hard night was when we had **lots of admissions**, bed moves still going, and I had to lead the team carefully so the ward stayed **safe**.",
+            voice: "Calm scene-setting. Stress night Nurse in Charge and safe."
+          },
+          {
+            text: "As Nurse in Charge I was responsible for the ward overnight: **beds**, putting admissions in the right place, moves and discharges, **delegating** work to the right nurse, and **escalating early** to site or doctors when we needed more help.",
+            voice: "Clear list. Stress escalate early."
+          },
+          {
+            text: "At handover I’d get the full picture first — who was sickest, who needed timed work, and how staffing looked. Then I’d **prioritise** the sickest patients and the urgent jobs, and give work to the **right person**, not just share it out evenly if that wasn’t safe.",
+            voice: "Show thinking. Stress prioritise."
+          },
+          {
+            text: "For admissions I’d check we could care for them safely, brief the nurse clearly, and call doctors quickly if someone was getting worse. If beds were tight or it was becoming unsafe, I’d **escalate to site** rather than quietly take the risk on myself.",
+            voice: "Steady. Stress escalate to site."
+          },
+          {
+            text: "We got through those nights with patients placed safely, clear priorities, and the team supported. What I learned is leadership under pressure is about **prioritising**, **escalating early**, and using the team well. I use the same approach in research when visits, recruitment and queries all land at once — and that carries across to **Band 6**.",
+            voice: "Strong bridge to Band 6. Then stop."
+          }
+        ]
+      }
+    };
+
+    const QUIZ = [
+      {
+        cat: "open", q: "Tell us about yourself.",
+        hooks: "**Band 5 research nurse** · Hub **2** days / Cardio **3** · about **10 studies** · **lead local delivery of CRAAFT-HF** · E8 **night in charge** · **Beyond Boundaries** · want **Band 6** onc/haem · **internal**",
+        detail: "Use Answer **A**. Keep it simple: who you are → Hub/Cardio → skills + **lead local delivery of CRAAFT** → E8 leadership → why cancer Band 6 → internal and ready to help.",
+        voice: "Warm and organised. Slow on CRAAFT and Band 6."
+      },
+      {
+        cat: "open", q: "You don’t have chemo experience — why appoint you?",
+        hooks: "Don’t claim **SACT** · research skills + **lead local delivery of CRAAFT** · **night in charge** · **SAFE-D** · job offers **training** · learn safely · **patient safety first**",
+        detail: "Use Answer **B**. Honest opening → what you *can* do → ward leadership + SAFE-D → learning plan → close on Band 6 readiness and safety.",
+        voice: "Soft on the gap. Stronger on what you bring."
+      },
+      {
+        cat: "research", q: "How do you take informed consent?",
+        hooks: "Capacity · approved **PIS**/consent form · on **delegation log** · plain English · **voluntary** · can withdraw · time · document · ask **PI** if unsure · never push",
+        detail: "I check they understand and have capacity. I only use the approved patient information sheet and consent form. I explain in plain language what the study is, what happens, risks and benefits, other options, that it’s voluntary, and that they can stop without their care changing. I check understanding, give them time, complete the consent form carefully, and ask the PI if I’m unsure or not on the delegation log for that study. I never push anyone.",
+        voice: "Calm and kind. Stress approved paperwork, voluntary and never push."
+      },
+      {
+        cat: "research", q: "What if you think there’s a serious adverse event (SAE)?",
+        hooks: "**Patient safety first** · clinical help · is it serious? · tell **PI** straight away · report per protocol / Trust timelines · document · learn",
+        detail: "Patient safety first — get clinical help if needed. Then I tell the PI straight away. We decide if it meets SAE criteria and follow the protocol and Trust reporting process within the required timelines. I document clearly. I don’t wait and hope it settles if it could be serious.",
+        voice: "Step by step. Firm on safety first and tell the PI straight away."
+      },
+      {
+        cat: "research", q: "Recruitment is behind — what do you do?",
+        hooks: "Find the **blockers** · check screen fails · work with **PI/MDT/wards** · protect visit slots · escalate honestly · never bend rules or pressure people",
+        detail: "I’d look at where it’s stuck — finding patients, timing, busy clinics, awareness, or who is screening out. I’d work with the PI, MDT and wards, protect visit slots, and escalate if we simply don’t have capacity. I won’t chase numbers by bending eligibility or pressuring people.",
+        voice: "Problem-solving. Stress never pressure people."
+      },
+      {
+        cat: "lead", q: "Give an example of leadership.",
+        hooks: "**Night in charge** (prioritise / delegate / escalate) **or** **lead local delivery of CRAAFT** with the PI",
+        detail: "Tell STAR **N** or STAR **C**. Keep it as a story: what was happening → what you owned at site → what you did → safe result → link to Band 6. Say local delivery, not ‘I am the PI’.",
+        voice: "Calm and clear. End on why it matters for Band 6."
+      },
+      {
+        cat: "lead", q: "How would you run an onc/haem research day?",
+        hooks: "Be visible · match work to skill mix · protect **visit times** · support juniors · keep paperwork tidy · escalate early · work with the **PI**",
+        detail: "I’d be present with the team, match jobs to skill mix, protect visit times, support juniors once they’re ready, keep paperwork neat for audit, escalate problems early, and work closely with PIs. Safety and GCP come before rushing numbers.",
+        voice: "Organising tone. Stress visit times and escalate early."
+      },
+      {
+        cat: "onc", q: "What’s your plan for learning chemo / SACT?",
+        hooks: "No made-up date · follow Trust **SACT** training · shadow day unit · only work within competence · escalate early",
+        detail: "I don’t claim SACT skills and I won’t invent a date. I’d follow the Trust training, shadow day unit and specialist nurses, finish the competency packs, and only do what I’m signed off for. Better slow and safe than fast and wrong.",
+        voice: "Humble but organised."
+      },
+      {
+        cat: "onc", q: "Consent with a scared newly diagnosed cancer patient?",
+        hooks: "**Slow down** · be honest · involve CNS/PI · protect choice · research isn’t their only care option",
+        detail: "I’d slow down, check if they’re ready to talk, use clear honest words, and involve the CNS or PI if needed. I’d protect their choice. Research should never feel like the only way to get care. If they’re too upset, I stop and come back later.",
+        voice: "Soft and kind. Stress slow down and protect choice."
+      },
+      {
+        cat: "scenario", q: "Patient thinks the trial is their only treatment.",
+        hooks: "Gently correct · **normal care continues** · risks/benefits · **voluntary** · time · involve PI/CNS",
+        detail: "I’d gently correct that. I’d explain their normal care continues either way, go through risks and benefits, say it’s voluntary, give time, and involve the PI or CNS if needed. Hope shouldn’t turn into pressure.",
+        voice: "Gentle but clear."
+      },
+      {
+        cat: "scenario", q: "A junior asks you to consent beyond their competence.",
+        hooks: "**Stop** · protect the patient · escalate · teach later · never shortcut **GCP**",
+        detail: "I’d stop it. Valid consent and patient safety come first. I’d take over or get someone competent, then use it as teaching afterwards. We don’t shortcut consent to save time.",
+        voice: "Firm but kind to the junior."
+      },
+      {
+        cat: "values", q: "Trust values — give examples.",
+        hooks: "**Working Together** · **Compassion** · **One Team** · **Always Improving**",
+        detail: "Working Together — planning consent with the MDT. Compassion — slowing down when someone is scared. One Team — Hub, cardiology and wards covering together. Always Improving — Beyond Boundaries and reviewing how we run studies.",
+        voice: "One short example each."
+      }
+    ];
+
+    const BANK = [
+      {
+        section: "Openers",
+        items: [
+          {
+            q: "Tell us about yourself.",
+            detail: "I’m Ashitha George, a Band 5 Clinical Research Nurse at Portsmouth Hospitals. Since December 2024 I’ve worked about two days in the Research Hub and three in Cardiology, across about ten studies. I do consent, study visits, bloods, ECGs, adverse-event notes and CRFs, to GCP. In Cardiology I lead local delivery of CRAAFT-HF with the PI. Before that I was on Respiratory E8 for nearly four years, including night Nurse in Charge, and I did Aspire and Beyond Boundaries. I’m applying for this Band 6 Oncology/Haematology post because I want to lead local delivery of cancer research studies more, help juniors, and learn oncology and chemo with proper training. I’m internal, so I already know Trust research systems and can help from day one."
+          },
+          {
+            q: "Why this role / why Oncology and Haematology?",
+            detail: "I enjoy research nursing and I want a clear specialty with cancer patients, where research sits beside complex treatment. Cardiology has given me commercial and registry skills. The Hub has given me flexibility and vaccine-trial experience. SAFE-D has already given me cancer-related screening and consent. Oncology/Haematology is where I want to grow next, and this Band 6 post offers the leadership step plus training for oncology and chemo skills."
+          },
+          {
+            q: "Why PHU / this team?",
+            detail: "I’m already in PHU Research & Innovation. I know Trust systems, GCP culture and how we work with clinical teams. I want to grow here. I’d also welcome time with Gemma Dixon’s onc/haem team to understand the live portfolio and help with NIHR and commercial targets from day one."
+          },
+          {
+            q: "You don’t have chemo experience — why appoint you?",
+            detail: "I’ll be straight: I don’t have chemo or SACT skills yet, and I wouldn’t pretend I do. What I do bring is research delivery here — consent, visits, bloods, adverse-event notes, GCP — and I already lead local delivery of CRAAFT-HF with the PI. I also bring night Nurse in Charge leadership from E8, and SAFE-D cancer screening/consent. The advert says these oncology and chemo skills can be learned with training. My plan is orient, shadow day unit, complete SACT packages, learn each study with the PI, and stay safe while I build up. You’d get someone who already delivers research well here, is honest about the gap, and ready for Band 6 local delivery ownership."
+          }
+        ]
+      },
+      {
+        section: "Research delivery",
+        items: [
+          {
+            q: "What experience do you have of clinical trials / GCP?",
+            detail: "Since December 2024 I’ve worked as a research nurse on Hub and Cardiology studies. I’ve done blinded vaccine visits, commercial cardiology trials, heart-failure registries, CRAAFT-HF where I lead local delivery with the PI, Phase I vaccine set-up support, and SAFE-D pancreatic surveillance screening/consent. I’m GCP trained and I’ve done consent, safety reporting, site file and related workshops."
+          },
+          {
+            q: "How do you take informed consent?",
+            detail: "I check understanding and capacity. I only use the approved patient information sheet and consent form, and I only consent if I’m on the delegation log for that study. I explain in plain English what happens, risks and benefits, other options, that it’s voluntary, and that they can stop without care changing. I check they understand, give time, complete the consent form carefully, and ask the PI if I’m unsure. I never push people."
+          },
+          {
+            q: "Give an example of screening or recruiting a participant.",
+            detail: "On CRAAFT-HF I work with clinics and wards to find possible patients, check eligibility with the team, and approach them at a good time. On SAFE-D I’ve screened and consented people for pancreatic cancer surveillance after diabetes, carefully and kindly. I always leave space for questions or saying no."
+          },
+          {
+            q: "Recruitment is behind target — what do you do?",
+            detail: "I’d look at where it’s stuck — finding patients, timing, busy clinics, staff awareness, or screen failures. I’d work with the PI, MDT and wards, protect visit slots, and escalate honestly if capacity is the real problem. I won’t chase numbers by bending eligibility or pressuring people."
+          },
+          {
+            q: "What if you suspect a serious adverse event (SAE)?",
+            detail: "Patient safety first — get clinical help if needed. Tell the PI straight away. Check if it meets SAE criteria and follow the protocol and Trust reporting process within the required timelines. Document clearly. Don’t sit on something that could be serious."
+          },
+          {
+            q: "What if you spot a protocol deviation?",
+            detail: "I stop anything unsafe, protect the patient, document what happened, tell the PI and follow Trust/sponsor process. Then we look at why it happened and how to stop it happening again. I don’t hide problems."
+          },
+          {
+            q: "Describe an independent study visit you’ve run.",
+            detail: "In the Hub I’ve run blinded vaccine visits on my own: checks, vitals, ECG, bloods, questionnaires, adverse-event review, CRFs and samples, following the protocol and protecting blinding. In Cardiology I also run visits and safety follow-up calls for studies including CRAAFT-HF."
+          },
+          {
+            q: "How do you keep documentation / CRF / site file quality high?",
+            detail: "I write things up the same day where I can, use source data carefully, keep the site file tidy, and raise queries early. Good documentation protects patients and keeps us audit-ready."
+          },
+          {
+            q: "Commercial trials vs NIHR studies — what’s your experience?",
+            detail: "I’ve supported commercial cardiology work such as ARTEMIS and Balanced, plus NIHR-aligned and registry work like PROTECT-HF, FIT-HF and UK-HFpEF, and Hub vaccine trials. Either way, patient safety, consent and GCP come first — sponsors change, the standards don’t."
+          },
+          {
+            q: "How do you work with a PI and the MDT?",
+            detail: "I keep the PI updated, clarify who owns each next step, and work with clinics and wards so research fits around clinical care. If something might put a visit window or safety at risk, I escalate early rather than waiting."
+          },
+          {
+            q: "How do you balance competing studies / visit windows?",
+            detail: "Safety and time-critical visit windows come first. Then recruitment timed to clinics, then queries, then paperwork the same day. If capacity is at risk I escalate early — same approach as night in charge on a busy ward."
+          }
+        ]
+      },
+      {
+        section: "Band 6 leadership",
+        items: [
+          {
+            q: "Give an example of leadership.",
+            detail: "On E8 I worked as night Nurse in Charge. On busy nights with lots of admissions I’d get the full picture at handover, prioritise the sickest patients, delegate to the right nurses, and escalate to site early if it was becoming unsafe. I use the same approach in research when visits and queries land together."
+          },
+          {
+            q: "Give an example of leading local study delivery.",
+            detail: "I lead local delivery of CRAAFT-HF. That means screening, consent support, visit coordination, and working with the PI and MDT day to day — not just helping when asked. If timing is tight, I agree a safe plan early so we don’t rush or approach people wrongly."
+          },
+          {
+            q: "How would you run an Oncology/Haematology research portfolio day to day?",
+            detail: "I’d be present with the team, match jobs to skill mix, protect visit times, support juniors once they’re ready, keep paperwork neat, escalate problems early, and work closely with PIs. Safety and GCP come before chasing numbers. I’d also be ready for Hub or Isle of Wight cover if the service needed that."
+          },
+          {
+            q: "How would you support junior research staff?",
+            detail: "I’d check what they’re competent for, supervise consent and procedures until they’re ready, give clear feedback, and stop anything unsafe. I’d teach as we go, and escalate if someone is asked to work beyond their competence."
+          },
+          {
+            q: "What’s your mentoring / Practice Supervisor experience?",
+            detail: "On E8 I mentored students and juniors as a Practice Supervisor. In research I support colleagues with visits and study tasks. I try to be clear, kind, and honest about what’s safe for them to do alone."
+          },
+          {
+            q: "How would you approach performance / APDR under senior guidance?",
+            detail: "I’d be fair and factual, give clear examples, set simple goals, and support improvement. If concerns continued I’d escalate to the Senior Research Sister / line structure rather than letting problems drift. I know Band 6 may support these processes under senior guidance."
+          },
+          {
+            q: "How do you prioritise when everything is urgent?",
+            detail: "Sickest patient / safety first, then time-critical study windows, then other recruitment and queries, then paperwork. I say what’s waiting, escalate early, and don’t try to hold unsafe risk on my own."
+          }
+        ]
+      },
+      {
+        section: "Oncology / Haematology",
+        items: [
+          {
+            q: "What attracts you to cancer research nursing?",
+            detail: "I want patient-facing research where people are often going through hard treatment decisions. SAFE-D started that interest for me. I want to build specialty depth in Oncology/Haematology while using the research skills I already have."
+          },
+          {
+            q: "How would you consent a scared newly diagnosed cancer patient?",
+            detail: "I’d slow down, check if they’re ready to talk, use plain honest words, and involve the CNS or PI if needed. I’d protect their choice. Research should never feel like the only way to get care. If they’re too upset, I stop and come back later."
+          },
+          {
+            q: "How would you support a research patient on an intensive treatment pathway?",
+            detail: "I’d coordinate around clinics and treatment days, keep consent clear, watch for adverse events and deterioration, escalate early, and work with the clinical and research teams so research doesn’t overwhelm care."
+          },
+          {
+            q: "What’s your plan for learning chemo / SACT?",
+            detail: "I don’t claim SACT skills and I won’t invent a date. I’d follow Trust training, shadow day unit and specialist nurses, finish competency packs, and only do what I’m signed off for. Better slow and safe than fast and wrong."
+          },
+          {
+            q: "How would you build relationships with tumour-site clinics?",
+            detail: "I’d introduce myself to clinic and CNS teams, learn their pathways, make screening easy for them, feed back what helps recruitment, and be reliable — if I say I’ll cover a clinic, I turn up prepared."
+          },
+          {
+            q: "Hub / Trust-wide cover vs specialty focus — how do you balance that?",
+            detail: "Specialty delivery comes first for my portfolio, but I can stay flexible when Hub or urgent studies need cover, as I do now. I’d agree priorities early with seniors so nothing falls between gaps."
+          },
+          {
+            q: "How would you escalate a deteriorating research patient?",
+            detail: "Same as any patient: ABC approach, get help, follow local escalation, tell the clinical team and PI/research team, document clearly, and stay with the patient until they’re safe."
+          }
+        ]
+      },
+      {
+        section: "Scenarios",
+        items: [
+          {
+            q: "Patient thinks the trial is their only treatment option.",
+            detail: "I’d gently correct that. I’d explain normal care continues either way, go through risks and benefits, say it’s voluntary, give time, and involve the PI or CNS if needed. Hope shouldn’t turn into pressure."
+          },
+          {
+            q: "A junior asks you to consent beyond their competence.",
+            detail: "I’d stop it. Valid consent and patient safety come first. I’d take over or get someone competent, then teach afterwards. We don’t shortcut consent to save time."
+          },
+          {
+            q: "Clinic overruns and you risk missing a visit window.",
+            detail: "I’d protect safety first, see what can still be done within the window, reschedule what must be rescheduled, tell the PI early, and document the plan. I won’t rush unsafe steps just to hit a clock."
+          },
+          {
+            q: "You’re asked to cover Hub / another specialty at short notice.",
+            detail: "I’d check I’m competent for the tasks, what’s already booked in my portfolio, and what would need covering or escalating. I’d agree priorities with seniors so patients and visit windows stay safe."
+          },
+          {
+            q: "Family are pressuring the patient to join a study.",
+            detail: "I’d speak with the patient alone if possible, make clear the choice is theirs, explain they can say no without it affecting care, and involve the PI/CNS if needed. Family support is welcome; pressure isn’t."
+          }
+        ]
+      },
+      {
+        section: "Values",
+        items: [
+          {
+            q: "Give examples of Trust values.",
+            detail: "Working Together — planning consent with the MDT. Compassion — slowing down when someone is scared. One Team — Hub, cardiology and wards covering together. Always Improving — Beyond Boundaries and reviewing how we run studies."
+          }
+        ]
+      }
+    ];
+
+    /* Acronyms = interview literacy only (not competence claims) */
+    const ACRONYMS = [
+      {
+        section: "Trials & GCP",
+        items: [
+          { a: "GCP", d: "Good Clinical Practice — the rules for running trials safely and honestly." },
+          { a: "ICH-GCP", d: "International (ICH) Good Clinical Practice standards used worldwide." },
+          { a: "PI", d: "Principal Investigator — the doctor (or lead) ultimately responsible for the study at the site. You work with them; you are not the PI." },
+          { a: "CI", d: "Chief Investigator — overall study lead (often across many UK sites)." },
+          { a: "Protocol", d: "The approved study plan. You follow it; you don’t invent shortcuts." },
+          { a: "SOP", d: "Standard Operating Procedure — Trust/department step-by-step how to do something." },
+          { a: "Delegation log", d: "List of who is allowed to do which study tasks (e.g. consent). Only do tasks you’re listed for." },
+          { a: "ISF / TMF", d: "Investigator Site File (site) / Trial Master File (sponsor) — essential study documents." },
+          { a: "IMP", d: "Investigational Medicinal Product — the study drug / vaccine being tested." },
+          { a: "Randomisation", d: "Assigning treatment by chance (e.g. study arm A vs B), not by preference." },
+          { a: "Blinding", d: "Keeping treatment allocation hidden (also called masking) so results aren’t biased." },
+          { a: "Double-blind", d: "Neither the patient nor the blinded staff know which treatment was given." },
+          { a: "SDV", d: "Source Data Verification — checking CRF entries against original notes / source data." }
+        ]
+      },
+      {
+        section: "Safety & data",
+        items: [
+          { a: "AE", d: "Adverse Event — any untoward medical happening in a trial participant (not only drug ‘side effects’)." },
+          { a: "SAE", d: "Serious Adverse Event — serious harm (e.g. hospitalisation, life-threatening). Safety first → tell PI → report to protocol / Trust timelines." },
+          { a: "SUSAR", d: "Suspected Unexpected Serious Adverse Reaction — serious, thought related to the IMP, and unexpected from the reference safety info." },
+          { a: "CRF", d: "Case Report Form — how study data is recorded. (Not the same as a Clinical Research Facility — see below.)" },
+          { a: "eCRF", d: "Electronic Case Report Form — online data capture for the trial." },
+          { a: "Source data", d: "Original records (notes, labs, ECG) that study data is taken from." },
+          { a: "CTCAE", d: "Common Terminology Criteria for Adverse Events — grades how severe treatment-related toxicities are (often used in cancer trials)." }
+        ]
+      },
+      {
+        section: "Consent & samples",
+        items: [
+          { a: "PIS", d: "Patient Information Sheet — approved written info about the study." },
+          { a: "ICF", d: "Informed Consent Form — the signed consent document (with the approved PIS process)." },
+          { a: "HTA", d: "Human Tissue Act — UK law for storing / using human tissue samples; follow approvals and labelling." }
+        ]
+      },
+      {
+        section: "NHS / UK research system",
+        items: [
+          { a: "R&D", d: "Research & Development — Trust research office / approvals and oversight." },
+          { a: "HRA", d: "Health Research Authority — UK body involved in research approvals processes." },
+          { a: "REC", d: "Research Ethics Committee — reviews ethics of the study." },
+          { a: "IRAS", d: "Integrated Research Application System — online UK research application system." },
+          { a: "NIHR", d: "National Institute for Health and Care Research — funds and supports NHS research delivery." },
+          { a: "NCRI", d: "National Cancer Research Institute — UK cancer research collaboration / networks (you may hear it in cancer trial talk)." },
+          { a: "CTRU", d: "Clinical Trials Research Unit — specialist unit that designs / manages trials." },
+          { a: "CRF (facility)", d: "Clinical Research Facility — a unit/space for research visits (different meaning from Case Report Form)." },
+          { a: "MDT", d: "Multidisciplinary Team — doctors, nurses, and other specialists who plan care together." },
+          { a: "CNS", d: "Clinical Nurse Specialist — specialty nurse (key partner for cancer pathways and consent timing)." }
+        ]
+      },
+      {
+        section: "Oncology treatment words",
+        items: [
+          { a: "SACT", d: "Systemic Anti-Cancer Therapy — treatments that travel through the body (chemo, some targeted drugs, immunotherapy, etc.). Learning plan only for Ashitha — do not claim competence yet." },
+          { a: "Chemo", d: "Chemotherapy — cytotoxic drugs that kill fast-dividing cells. One type of SACT." },
+          { a: "IO", d: "Immunotherapy — treatments that help the immune system attack cancer (often discussed separately from classic chemo)." },
+          { a: "Targeted therapy", d: "Drugs aimed at specific cancer pathways / markers (not the same as general chemo)." },
+          { a: "ECOG / PS", d: "Eastern Cooperative Oncology Group Performance Status — score for how active/well a patient is day to day (eligibility often depends on this)." },
+          { a: "RECIST", d: "Rules for measuring tumour response on scans in many solid-tumour trials." },
+          { a: "Neutropenia", d: "Low neutrophils (infection-fighting white cells) — important safety watch in many cancer treatments." },
+          { a: "Febrile neutropenia", d: "Fever with low neutrophils — treat as urgent clinical emergency." }
+        ]
+      },
+      {
+        section: "Disease intent & staging",
+        items: [
+          { a: "TNM", d: "Tumour / Node / Metastasis — common solid-tumour staging system." },
+          { a: "Metastatic", d: "Cancer that has spread beyond the primary site (also called ‘mets’)." },
+          { a: "Adjuvant", d: "Treatment after main surgery / primary treatment to lower the chance of cancer coming back." },
+          { a: "Neoadjuvant", d: "Treatment before surgery to shrink disease or make surgery safer." },
+          { a: "Curative intent", d: "Treatment aiming to clear the cancer / cure." },
+          { a: "Palliative", d: "Aim is control of disease / symptoms and quality of life — not cure (still active treatment often)." }
+        ]
+      },
+      {
+        section: "Haematology (common labels)",
+        items: [
+          { a: "AML", d: "Acute Myeloid Leukaemia — fast-onset blood cancer of myeloid cells." },
+          { a: "ALL", d: "Acute Lymphoblastic Leukaemia — fast-onset blood cancer of lymphoid cells (more common in children, also adults)." },
+          { a: "CLL", d: "Chronic Lymphocytic Leukaemia — usually slower blood cancer of lymphocytes." },
+          { a: "CML", d: "Chronic Myeloid Leukaemia — blood cancer often linked to the BCR-ABL / Philadelphia pathway." },
+          { a: "MDS", d: "Myelodysplastic Syndrome — bone marrow disorders with abnormal blood cell production." },
+          { a: "NHL", d: "Non-Hodgkin Lymphoma — group of lymphomas that are not Hodgkin lymphoma." },
+          { a: "HL", d: "Hodgkin Lymphoma — a specific lymphoma type." },
+          { a: "HDCT", d: "High-Dose Chemotherapy — very intensive chemo (often before stem-cell transplant)." },
+          { a: "ASCT", d: "Autologous Stem Cell Transplant — patient’s own stem cells given back after high-dose treatment." },
+          { a: "BMT / allo", d: "Bone Marrow / allogeneic transplant — stem cells from a donor (allogeneic)." }
+        ]
+      }
+    ];
+
+    let currentScript = "A";
+    let scriptIndex = 0;
+    let showAll = false;
+    let quizIndex = 0;
+    let quizMode = 0;
+    let quizFilter = "all";
+
+    function showPanel(id) {
+      document.querySelectorAll(".panel").forEach(p => p.classList.toggle("active", p.dataset.panel === id));
+      document.querySelectorAll("#tabs button").forEach(b => b.classList.toggle("active", b.dataset.tab === id));
+      if (id === "script") renderScript();
+      if (id === "voice") renderVoicePage();
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    function setScript(key) {
+      currentScript = key;
+      scriptIndex = 0;
+      showAll = false;
+      renderScript();
+      renderVoicePage();
+      syncPickers();
+    }
+
+    function syncPickers() {
+      document.querySelectorAll(".pick button").forEach(b => {
+        b.classList.toggle("active", b.dataset.key === currentScript);
+      });
+    }
+
+    function buildPicker(el) {
+      el.innerHTML = "";
+      [["A","About you"],["B","Why appoint you"],["C","CRAAFT"],["N","Night charge"]].forEach(([key, label]) => {
+        const b = document.createElement("button");
+        b.dataset.key = key;
+        b.textContent = key + " · " + label;
+        b.addEventListener("click", () => {
+          setScript(key);
+          if (el.id === "scriptPick") showPanel("script");
+        });
+        el.appendChild(b);
+      });
+    }
+
+    buildPicker(document.getElementById("scriptPick"));
+    buildPicker(document.getElementById("voicePick"));
+
+    const tabs = [
+      { id: "home", label: "Home" },
+      { id: "script", label: "Scripts" },
+      { id: "questions", label: "Quiz" },
+      { id: "voice", label: "Voice" },
+      { id: "bank", label: "All Qs" },
+      { id: "nurse", label: "Nurse cards" },
+      { id: "acronyms", label: "Acronyms" },
+      { id: "tips", label: "Tips" }
+    ];
+    const tabsEl = document.getElementById("tabs");
+    tabs.forEach(t => {
+      const b = document.createElement("button");
+      b.textContent = t.label;
+      b.dataset.tab = t.id;
+      b.addEventListener("click", () => showPanel(t.id));
+      tabsEl.appendChild(b);
+    });
+    document.querySelectorAll("[data-go]").forEach(btn => {
+      btn.addEventListener("click", () => showPanel(btn.dataset.go));
+    });
+
+    const homeGrid = document.getElementById("homeGrid");
+    [
+      { key: "A", kicker: "Opening", title: "Tell us about yourself" },
+      { key: "B", kicker: "Opening", title: "Why appoint you?" },
+      { key: "C", kicker: "STAR", title: "CRAAFT-HF story" },
+      { key: "N", kicker: "STAR", title: "Night in charge story" }
+    ].forEach(item => {
+      const b = document.createElement("button");
+      b.className = "home-tile";
+      b.innerHTML = `<div class="kicker">${item.kicker} · ${item.key}</div><div class="title">${item.title}</div>`;
+      b.addEventListener("click", () => { setScript(item.key); showPanel("script"); });
+      homeGrid.appendChild(b);
+    });
+    [
+      { id: "nurse", kicker: "Quick cards", title: "Consent · SAE · red lines" },
+      { id: "acronyms", kicker: "Literacy", title: "Onc / haem acronyms" }
+    ].forEach(item => {
+      const b = document.createElement("button");
+      b.className = "home-tile";
+      b.innerHTML = `<div class="kicker">${item.kicker}</div><div class="title">${item.title}</div>`;
+      b.addEventListener("click", () => showPanel(item.id));
+      homeGrid.appendChild(b);
+    });
+
+    function renderScript() {
+      const s = SCRIPTS[currentScript];
+      document.documentElement.style.setProperty("--accent", ACCENT[s.pill]);
+      const pill = document.getElementById("scriptPill");
+      pill.className = "pill " + s.pill;
+      pill.textContent = "Answer " + s.code;
+      document.getElementById("scriptTitle").textContent = s.title;
+      document.getElementById("scriptMeta").textContent = s.meta;
+
+      document.getElementById("scriptVoiceOverall").innerHTML =
+        `<div class="label">${s.voiceOverall.label}</div>${s.voiceOverall.html}`;
+
+      const p = s.paras[scriptIndex];
+      document.getElementById("scriptPara").innerHTML = md(p.text);
+      document.getElementById("scriptVoicePara").innerHTML =
+        `<div class="label">This bit — how to say it (Answer ${s.code})</div><p>${md(p.voice)}</p>`;
+      document.getElementById("scriptStep").textContent =
+        `Paragraph ${scriptIndex + 1} of ${s.paras.length}`;
+      document.getElementById("scriptBar").style.width = ((scriptIndex + 1) / s.paras.length * 100) + "%";
+      document.getElementById("scriptPrev").disabled = scriptIndex === 0;
+      document.getElementById("scriptNext").textContent = scriptIndex === s.paras.length - 1 ? "Finish" : "Next";
+      document.getElementById("scriptFullWrap").hidden = !showAll;
+      document.getElementById("scriptFull").innerHTML = s.paras.map(x => md(x.text)).join("<br><br>");
+      syncPickers();
+    }
+
+    function renderVoicePage() {
+      const s = SCRIPTS[currentScript];
+      document.documentElement.style.setProperty("--accent", ACCENT[s.pill]);
+      document.getElementById("voiceDynamic").innerHTML =
+        `<h2>Voice for Answer ${s.code}</h2>` +
+        `<div class="voice-box"><div class="label">${s.voiceOverall.label}</div>${s.voiceOverall.html}</div>` +
+        `<p class="muted">Change A / B / C / N above — this box changes with it.</p>`;
+      syncPickers();
+    }
+
+    document.getElementById("scriptPrev").addEventListener("click", () => {
+      scriptIndex = Math.max(0, scriptIndex - 1); showAll = false; renderScript();
+    });
+    document.getElementById("scriptNext").addEventListener("click", () => {
+      const s = SCRIPTS[currentScript];
+      if (scriptIndex < s.paras.length - 1) { scriptIndex++; showAll = false; }
+      else showAll = true;
+      renderScript();
+    });
+    document.getElementById("scriptAll").addEventListener("click", () => {
+      showAll = !showAll; renderScript();
+    });
+
+    function filteredQuiz() {
+      return quizFilter === "all" ? QUIZ : QUIZ.filter(x => x.cat === quizFilter);
+    }
+    function renderQuiz() {
+      const list = filteredQuiz();
+      if (!list.length) return;
+      quizIndex = ((quizIndex % list.length) + list.length) % list.length;
+      const item = list[quizIndex];
+      const modes = ["Question", "Short points", "Question + full answer"];
+      document.getElementById("qSide").textContent = modes[quizMode];
+      let body;
+      if (quizMode === 0) body = item.q;
+      else if (quizMode === 1) body = item.hooks;
+      else body = `**Question**\n${item.q}\n\n**Detailed answer**\n${item.detail}`;
+      document.getElementById("qText").innerHTML = md(body);
+      const v = document.getElementById("qVoice");
+      if (quizMode === 0) v.hidden = true;
+      else {
+        v.hidden = false;
+        v.innerHTML = `<div class="label">How to sound</div><p>${md(item.voice)}</p>`;
+      }
+      document.querySelectorAll("#qModes button").forEach(b => {
+        b.classList.toggle("active", Number(b.dataset.mode) === quizMode);
+      });
+      document.getElementById("qCount").textContent =
+        `Q ${quizIndex + 1} of ${list.length}` + (quizFilter !== "all" ? ` · ${quizFilter}` : "") +
+        ` · step ${quizMode + 1}/3`;
+    }
+    function flipQuiz() { quizMode = (quizMode + 1) % 3; renderQuiz(); }
+    document.getElementById("qFlip").addEventListener("click", flipQuiz);
+    document.getElementById("qFlipBtn").addEventListener("click", flipQuiz);
+    document.getElementById("qPrev").addEventListener("click", () => { quizIndex--; quizMode = 0; renderQuiz(); });
+    document.getElementById("qNext").addEventListener("click", () => { quizIndex++; quizMode = 0; renderQuiz(); });
+    document.querySelectorAll("#qModes button").forEach(b => {
+      b.addEventListener("click", () => { quizMode = Number(b.dataset.mode); renderQuiz(); });
+    });
+
+    let timerLeft = 90;
+    let timerId = null;
+    const timerEl = document.getElementById("qTimer");
+    const timerStartBtn = document.getElementById("qTimerStart");
+    function paintTimer() {
+      const m = Math.floor(timerLeft / 60);
+      const s = timerLeft % 60;
+      timerEl.textContent = m + ":" + String(s).padStart(2, "0");
+      timerEl.classList.toggle("warn", timerLeft > 0 && timerLeft <= 15);
+    }
+    function stopTimer() {
+      if (timerId) { clearInterval(timerId); timerId = null; }
+      timerStartBtn.textContent = "Start 90s";
+    }
+    function resetTimer() {
+      stopTimer();
+      timerLeft = 90;
+      paintTimer();
+    }
+    timerStartBtn.addEventListener("click", () => {
+      if (timerId) { stopTimer(); return; }
+      if (timerLeft <= 0) timerLeft = 90;
+      paintTimer();
+      timerStartBtn.textContent = "Pause";
+      timerId = setInterval(() => {
+        timerLeft--;
+        paintTimer();
+        if (timerLeft <= 0) {
+          stopTimer();
+          timerEl.textContent = "0:00";
+          timerEl.classList.add("warn");
+        }
+      }, 1000);
+    });
+    document.getElementById("qTimerReset").addEventListener("click", resetTimer);
+    paintTimer();
+
+    function renderAcronyms() {
+      const q = (document.getElementById("acroSearch").value || "").trim().toLowerCase();
+      const list = document.getElementById("acroList");
+      list.innerHTML = "";
+      let shown = 0;
+      ACRONYMS.forEach(group => {
+        const items = group.items.filter(it => {
+          if (!q) return true;
+          return (it.a + " " + it.d).toLowerCase().includes(q);
+        });
+        if (!items.length) return;
+        const card = document.createElement("div");
+        card.className = "card";
+        const h = document.createElement("h3");
+        h.textContent = group.section;
+        card.appendChild(h);
+        items.forEach(it => {
+          shown++;
+          const row = document.createElement("div");
+          row.className = "acro-row";
+          row.innerHTML = `<div class="acro-abbr">${it.a}</div><div class="acro-def">${it.d}</div>`;
+          card.appendChild(row);
+        });
+        list.appendChild(card);
+      });
+      const total = ACRONYMS.reduce((n, g) => n + g.items.length, 0);
+      document.getElementById("acroCount").textContent = q
+        ? `Showing ${shown} of ${total}`
+        : `${total} acronyms · use search to filter`;
+      if (!shown) {
+        const empty = document.createElement("p");
+        empty.className = "acro-empty";
+        empty.textContent = "No matches — try SAE, SACT, PI, AML…";
+        list.appendChild(empty);
+      }
+    }
+    document.getElementById("acroSearch").addEventListener("input", renderAcronyms);
+
+    const filters = document.getElementById("qFilters");
+    [["all","All"],["open","Opening"],["research","Research"],["lead","Leadership"],["onc","Onc/Haem"],["scenario","Scenarios"],["values","Values"]]
+      .forEach(([id, label]) => {
+        const b = document.createElement("button");
+        b.className = "btn" + (id === "all" ? " primary" : "");
+        b.textContent = label;
+        b.addEventListener("click", () => {
+          quizFilter = id; quizIndex = 0; quizMode = 0;
+          [...filters.children].forEach(x => x.classList.remove("primary"));
+          b.classList.add("primary");
+          renderQuiz();
+        });
+        filters.appendChild(b);
+      });
+
+    const bankList = document.getElementById("bankList");
+    BANK.forEach(group => {
+      const h = document.createElement("h3");
+      h.className = "section-h";
+      h.textContent = group.section;
+      bankList.appendChild(h);
+      group.items.forEach(item => {
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = "q-acc";
+        btn.innerHTML =
+          `<span class="q-chev">+</span><div class="q-title">${md(item.q)}</div>` +
+          `<div class="q-body">` +
+          `<div class="q-label">Question</div><div class="para">${md(item.q)}</div>` +
+          `<div class="q-label">Detailed answer — say this</div><div class="para">${md(item.detail)}</div>` +
+          `</div>`;
+        btn.addEventListener("click", () => {
+          const opening = !btn.classList.contains("open");
+          document.querySelectorAll(".q-acc.open").forEach(x => {
+            x.classList.remove("open");
+            const c = x.querySelector(".q-chev");
+            if (c) c.textContent = "+";
+          });
+          if (opening) {
+            btn.classList.add("open");
+            btn.querySelector(".q-chev").textContent = "−";
+          }
+        });
+        bankList.appendChild(btn);
+      });
+    });
+
+    showPanel("home");
+    renderScript();
+    renderVoicePage();
+    renderQuiz();
+    renderAcronyms();
+  </script>
+</body>
+</html>

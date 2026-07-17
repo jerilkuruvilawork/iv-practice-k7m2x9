@@ -4,7 +4,8 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <meta name="theme-color" content="#1a3a3a" />
-  <title>Ashitha — Interview Practice</title>
+  <meta name="robots" content="noindex, nofollow, noarchive" />
+  <title>Interview Practice</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,650&family=Source+Sans+3:wght@400;600;700&display=swap" rel="stylesheet" />
@@ -117,9 +118,41 @@
       font-family: var(--display); font-weight: 650; font-size: 1.35rem; min-width: 3.5rem;
     }
     .timer-display.warn { color: #6b2e36; }
+    #lockGate {
+      position: fixed; inset: 0; z-index: 9999; display: flex; align-items: center; justify-content: center;
+      padding: 24px; background:
+        radial-gradient(ellipse 80% 40% at 10% -10%, #dfecea 0%, transparent 55%),
+        radial-gradient(ellipse 60% 30% at 100% 0%, #ebe4dc 0%, transparent 50%), var(--bg);
+    }
+    #lockGate[hidden] { display: none !important; }
+    #lockGate .lock-card {
+      width: 100%; max-width: 360px; background: var(--bg2); border: 1px solid var(--line);
+      border-radius: var(--radius); padding: 22px 20px;
+    }
+    #lockGate h1 { font-family: var(--display); font-size: 1.35rem; margin: 0 0 6px; }
+    #lockGate p { margin: 0 0 14px; color: var(--muted); font-size: 0.92rem; }
+    #lockGate input {
+      width: 100%; border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px;
+      font: inherit; background: #fff; color: var(--ink); margin-bottom: 10px;
+    }
+    #lockGate .lock-err { color: #6b2e36; font-size: 0.88rem; min-height: 1.2em; margin: 0 0 8px; }
+    #appRoot[hidden] { display: none !important; }
   </style>
 </head>
 <body>
+  <div id="lockGate" role="dialog" aria-modal="true" aria-labelledby="lockTitle">
+    <div class="lock-card">
+      <h1 id="lockTitle">Interview practice</h1>
+      <p>Private study site — enter the shared password to continue.</p>
+      <form id="lockForm" autocomplete="current-password">
+        <input id="lockPass" type="password" name="password" placeholder="Password" required autofocus />
+        <p class="lock-err" id="lockErr" aria-live="polite"></p>
+        <button class="btn primary" type="submit" style="width:100%">Unlock</button>
+      </form>
+    </div>
+  </div>
+
+  <div id="appRoot" hidden>
   <header class="app">
     <h1>Ashitha · Interview practice</h1>
     <p>Band 6 Specialist Research Nurse — Oncology / Haematology · PHU</p>
@@ -310,6 +343,55 @@
     <button class="btn primary" type="button" data-go="questions">Quiz</button>
     <button class="btn" type="button" data-go="voice">Voice</button>
   </footer>
+  </div>
+
+  <script>
+    (function () {
+      var PASS_HASH = "acac78617f2a40d929fc4cfb8c6655d09070cb8c4b8ac6d0b58e62893c8f2571";
+      var KEY = "ivPracticeUnlocked_v1";
+      function hex(buf) {
+        return Array.from(new Uint8Array(buf)).map(function (b) {
+          return b.toString(16).padStart(2, "0");
+        }).join("");
+      }
+      async function sha256(text) {
+        var data = new TextEncoder().encode(text);
+        return hex(await crypto.subtle.digest("SHA-256", data));
+      }
+      function unlockUi() {
+        document.getElementById("lockGate").hidden = true;
+        document.getElementById("appRoot").hidden = false;
+        if (typeof window.__bootPractice === "function") window.__bootPractice();
+      }
+      async function tryUnlock(pass) {
+        var h = await sha256(pass);
+        if (h !== PASS_HASH) return false;
+        try { sessionStorage.setItem(KEY, "1"); } catch (e) {}
+        unlockUi();
+        return true;
+      }
+      window.__practiceGate = { tryUnlock: tryUnlock, unlockUi: unlockUi, KEY: KEY };
+      try {
+        if (sessionStorage.getItem(KEY) === "1") {
+          unlockUi();
+          return;
+        }
+      } catch (e) {}
+      var form = document.getElementById("lockForm");
+      var err = document.getElementById("lockErr");
+      form.addEventListener("submit", function (ev) {
+        ev.preventDefault();
+        err.textContent = "";
+        var pass = document.getElementById("lockPass").value;
+        tryUnlock(pass).then(function (ok) {
+          if (!ok) {
+            err.textContent = "Wrong password. Check the note from Jeril.";
+            document.getElementById("lockPass").select();
+          }
+        });
+      });
+    })();
+  </script>
 
   <script>
     function md(s) {
@@ -1097,11 +1179,18 @@
       });
     });
 
-    showPanel("home");
-    renderScript();
-    renderVoicePage();
-    renderQuiz();
-    renderAcronyms();
+    window.__bootPractice = function () {
+      if (window.__practiceBooted) return;
+      window.__practiceBooted = true;
+      showPanel("home");
+      renderScript();
+      renderVoicePage();
+      renderQuiz();
+      renderAcronyms();
+    };
+    try {
+      if (sessionStorage.getItem("ivPracticeUnlocked_v1") === "1") window.__bootPractice();
+    } catch (e) {}
   </script>
 </body>
 </html>

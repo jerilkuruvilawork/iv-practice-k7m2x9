@@ -140,6 +140,30 @@
     }
     #lockGate .lock-err { color: #6b2e36; font-size: 0.88rem; min-height: 1.2em; margin: 0 0 8px; }
     #appRoot[hidden] { display: none !important; }
+    .order-item {
+      display: flex; align-items: flex-start; gap: 10px;
+      background: #fff; border: 1px solid var(--line); border-radius: 12px;
+      padding: 12px; margin-bottom: 8px;
+    }
+    .order-item .ord {
+      flex: 0 0 28px; height: 28px; border-radius: 8px; background: var(--accent); color: #fff;
+      display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.9rem; margin-top: 2px;
+    }
+    .order-item .order-body { flex: 1; min-width: 0; font-size: 0.95rem; }
+    .order-item .order-body .lab { font-weight: 700; color: var(--accent); margin-right: 4px; }
+    .order-moves { display: flex; flex-direction: column; gap: 4px; }
+    .order-moves button {
+      width: 40px; height: 36px; border-radius: 10px; border: 1px solid var(--line);
+      background: var(--bg2); font-size: 1rem; cursor: pointer;
+    }
+    .order-item.correct { border-color: #2d5a3d; background: #eef6f0; }
+    .order-item.wrong { border-color: #6b2e36; background: #f8eeee; }
+    .order-result {
+      border-radius: 12px; padding: 12px 14px; margin-top: 10px; font-size: 0.95rem;
+    }
+    .order-result.ok { background: #eef6f0; border: 1px solid #b7d0be; }
+    .order-result.bad { background: #f8eeee; border: 1px solid #e0b8bc; }
+    .order-why { margin-top: 8px; font-size: 0.9rem; color: var(--muted); }
   </style>
 </head>
 <body>
@@ -172,7 +196,7 @@
           <li>Read the yellow box first — that’s how to say it.</li>
           <li><strong>Bold words</strong> = say a bit slower / stronger.</li>
           <li>Quiz has three steps: Question → Short hooks → Full answer.</li>
-          <li><strong>Nurse cards</strong> = consent / SAE checklists. <strong>Acronyms</strong> = onc/haem & trial words.</li>
+          <li><strong>Nurse cards</strong> = consent / SAE checklists. <strong>Order game</strong> = prioritise tasks. <strong>Acronyms</strong> = onc/haem & trial words.</li>
         </ol>
         <div class="hint">Don’t make up numbers. Don’t say you can give chemo / SACT yet. Acronyms are for learning only.</div>
       </div>
@@ -272,11 +296,34 @@
       <div class="card">
         <h2>On the website too</h2>
         <ul class="clean">
+          <li><strong>Order game</strong> — prioritise morning tasks / SAE / consent (best for the set task)</li>
           <li><strong>Nurse cards</strong> — consent + SAE order + do-not-say</li>
           <li><strong>Acronyms</strong> — SACT, SAE, RECIST, AML… (literacy only)</li>
           <li><strong>Quiz</strong> — Flip answers + optional 90s timer</li>
         </ul>
       </div>
+    </section>
+
+    <section class="panel" data-panel="order">
+      <div class="card">
+        <h2>Ordering game</h2>
+        <p class="muted">Tap ↑ ↓ to set priority (1 = do first). Then <strong>Check</strong>. Best practice for the interview task.</p>
+        <div class="mode-row" id="orderGames"></div>
+        <div class="row" style="margin-top:10px">
+          <button class="btn" type="button" id="orderShuffle">Shuffle</button>
+          <button class="btn" type="button" id="orderReset">Reset mix</button>
+          <button class="btn primary" type="button" id="orderCheck">Check</button>
+          <button class="btn" type="button" id="orderWhy">Show why</button>
+        </div>
+        <p class="step-label" id="orderTimerLabel" style="margin-top:8px"></p>
+        <div class="row">
+          <button class="btn" type="button" id="orderTimer">Start 90s</button>
+          <button class="btn" type="button" id="orderTimerStop">Stop timer</button>
+        </div>
+      </div>
+      <div id="orderList"></div>
+      <div id="orderResult" hidden></div>
+      <div class="card order-why" id="orderWhyBox" hidden></div>
     </section>
 
     <section class="panel" data-panel="nurse">
@@ -297,7 +344,7 @@
       </div>
       <div class="card">
         <h3>Mock task — prioritise these (15 min)</h3>
-        <p class="muted">Write order 1–6, then say aloud. Full sheet: <code>MOCK_TASK_PRIORITISATION.md</code></p>
+        <p class="muted">Prefer the interactive <strong>Order game</strong> tab for this. Full sheet: <code>MOCK_TASKS_ALL.md</code></p>
         <ol class="clean">
           <li><strong>A.</strong> Voicemail: participant admitted overnight with severe SOB on IMP study — please call back</li>
           <li><strong>B.</strong> Visit window for Pt 014 closes <strong>today 17:00</strong> (bloods, ECG, AE, eCRF) — slot 11:00</li>
@@ -995,6 +1042,7 @@
       { id: "home", label: "Home" },
       { id: "script", label: "Scripts" },
       { id: "questions", label: "Quiz" },
+      { id: "order", label: "Order game" },
       { id: "voice", label: "Voice" },
       { id: "bank", label: "All Qs" },
       { id: "nurse", label: "Nurse cards" },
@@ -1027,6 +1075,7 @@
       homeGrid.appendChild(b);
     });
     [
+      { id: "order", kicker: "Interview task", title: "Ordering game" },
       { id: "nurse", kicker: "Quick cards", title: "Consent · SAE · red lines" },
       { id: "acronyms", kicker: "Literacy", title: "Onc / haem acronyms" }
     ].forEach(item => {
@@ -1245,6 +1294,185 @@
       });
     });
 
+    /* ---- Ordering games ---- */
+    const ORDER_GAMES = {
+      morning: {
+        label: "1 · Morning priorities",
+        intro: "08:45 onc/haem research. No SACT competence yet. Put first things first.",
+        correct: ["A", "C", "B", "F", "E", "D"],
+        acceptAlt: [["C", "A", "B", "F", "E", "D"]],
+        why: "<p><strong>Model:</strong> A → C → B → F → E → D (C→A also OK if you still contact A within minutes).</p><ul class='clean'><li><strong>A</strong> possible SAE — safety + PI first</li><li><strong>C</strong> stop unsafe/rushed consent</li><li><strong>B</strong> protect today’s visit window</li><li><strong>F</strong> blood only via competent/safe route</li><li><strong>E</strong> screen properly or book back</li><li><strong>D</strong> sponsor query due tomorrow</li></ul><p>Say aloud: safety and valid consent first, then windows, escalate outside competence, queries last.</p>",
+        items: {
+          A: "Voicemail: IMP participant admitted overnight with severe SOB — call back",
+          B: "Visit window Pt 014 closes today 17:00 (bloods, ECG, AE, eCRF) — slot 11:00",
+          C: "Band 5 asks you to countersign consent — no overnight PIS; consultant wants randomise today",
+          D: "Sponsor queries (3 missing AE pages) — due end of tomorrow",
+          E: "New screening referral — patient keen and waiting now",
+          F: "Ward wants protocol blood on SACT day unit now — you’re not signed off there"
+        }
+      },
+      sae: {
+        label: "2 · SAE steps",
+        intro: "Put the SAE response steps in the order you would say/do them.",
+        correct: ["1", "2", "3", "4", "5", "6"],
+        why: "<p>Always: <strong>patient safety → PI → criteria → timelines → document → follow up</strong>.</p>",
+        items: {
+          "1": "Patient safety / clinical help first",
+          "2": "Tell the PI straight away",
+          "3": "Check if it meets seriousness criteria (per protocol)",
+          "4": "Report within protocol / Trust timelines",
+          "5": "Document clearly what happened and what you did",
+          "6": "Follow up and learn with the team"
+        }
+      },
+      consent: {
+        label: "3 · Consent spine",
+        intro: "Order the consent process points as you’d walk through them.",
+        correct: ["1", "2", "3", "4", "5", "6"],
+        why: "<p>Check you’re allowed and using the right papers first, then explain, then voluntary choice, then document.</p>",
+        items: {
+          "1": "Confirm capacity / understanding and that you are on the delegation log",
+          "2": "Use only the approved PIS + consent form for this study",
+          "3": "Explain what / why / risks / benefits / alternatives in plain English",
+          "4": "Make clear it is voluntary, they can withdraw, and care continues either way",
+          "5": "Give time; check understanding (teach-back); never pressure",
+          "6": "Document; escalate to PI if unsure"
+        }
+      },
+      multitask: {
+        label: "4 · Multi-station",
+        intro: "You get three issues at once. What order do you handle them?",
+        correct: ["S", "C", "Q"],
+        why: "<p><strong>S → C → Q</strong>: SAE/safety call first, then protect consent on the other patient, then non-urgent sponsor query.</p>",
+        items: {
+          S: "Partner calls: black stools + dizziness; patient at home on IMP study",
+          C: "Consultant wants same-day consent on another overwhelmed patient (no PIS yet)",
+          Q: "Sponsor email: missing AE pages — reply due end of tomorrow"
+        }
+      }
+    };
+
+    let orderGameId = "morning";
+    let orderState = [];
+    let orderTimer = null;
+    let orderTimerLeft = 0;
+
+    function shuffle(arr) {
+      const a = arr.slice();
+      for (let i = a.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        const t = a[i]; a[i] = a[j]; a[j] = t;
+      }
+      return a;
+    }
+
+    function sameOrder(a, b) {
+      return a.length === b.length && a.every((x, i) => x === b[i]);
+    }
+
+    function initOrderGame(id, doShuffle) {
+      orderGameId = id;
+      const g = ORDER_GAMES[id];
+      const keys = Object.keys(g.items);
+      orderState = doShuffle === false ? g.correct.slice() : shuffle(keys);
+      document.getElementById("orderResult").hidden = true;
+      document.getElementById("orderWhyBox").hidden = true;
+      document.querySelectorAll("#orderGames button").forEach(b => {
+        b.classList.toggle("active", b.dataset.game === id);
+      });
+      renderOrderList();
+    }
+
+    function renderOrderList() {
+      const g = ORDER_GAMES[orderGameId];
+      const list = document.getElementById("orderList");
+      list.innerHTML = `<div class="card" style="margin-bottom:10px"><p class="muted" style="margin:0">${g.intro}</p></div>`;
+      orderState.forEach((key, idx) => {
+        const row = document.createElement("div");
+        row.className = "order-item";
+        row.dataset.key = key;
+        row.innerHTML =
+          `<div class="ord">${idx + 1}</div>` +
+          `<div class="order-body"><span class="lab">${key}.</span> ${g.items[key]}</div>` +
+          `<div class="order-moves">` +
+          `<button type="button" data-move="up" data-i="${idx}" aria-label="Move up">↑</button>` +
+          `<button type="button" data-move="down" data-i="${idx}" aria-label="Move down">↓</button>` +
+          `</div>`;
+        list.appendChild(row);
+      });
+      list.querySelectorAll("button[data-move]").forEach(btn => {
+        btn.addEventListener("click", () => {
+          const i = Number(btn.dataset.i);
+          const j = btn.dataset.move === "up" ? i - 1 : i + 1;
+          if (j < 0 || j >= orderState.length) return;
+          const t = orderState[i]; orderState[i] = orderState[j]; orderState[j] = t;
+          document.getElementById("orderResult").hidden = true;
+          renderOrderList();
+        });
+      });
+    }
+
+    function checkOrder() {
+      const g = ORDER_GAMES[orderGameId];
+      const ok = sameOrder(orderState, g.correct) ||
+        (g.acceptAlt || []).some(alt => sameOrder(orderState, alt));
+      const box = document.getElementById("orderResult");
+      box.hidden = false;
+      box.className = "order-result " + (ok ? "ok" : "bad");
+      if (ok) {
+        box.innerHTML = "<strong>Good order.</strong> Now say your actions out loud for each item (who you’d call, what you’d do).";
+      } else {
+        box.innerHTML = "<strong>Not quite.</strong> Keep adjusting with ↑ ↓, or tap <em>Show why</em> for the model order. Hint: safety and valid consent beat visit windows and emails.";
+      }
+      const list = document.getElementById("orderList");
+      list.querySelectorAll(".order-item").forEach((row, idx) => {
+        row.classList.remove("correct", "wrong");
+        const want = g.correct[idx];
+        row.classList.add(row.dataset.key === want ? "correct" : "wrong");
+      });
+    }
+
+    (function setupOrderGames() {
+      const wrap = document.getElementById("orderGames");
+      Object.keys(ORDER_GAMES).forEach(id => {
+        const b = document.createElement("button");
+        b.type = "button";
+        b.dataset.game = id;
+        b.textContent = ORDER_GAMES[id].label;
+        b.addEventListener("click", () => initOrderGame(id, true));
+        wrap.appendChild(b);
+      });
+      document.getElementById("orderShuffle").addEventListener("click", () => initOrderGame(orderGameId, true));
+      document.getElementById("orderReset").addEventListener("click", () => initOrderGame(orderGameId, true));
+      document.getElementById("orderCheck").addEventListener("click", checkOrder);
+      document.getElementById("orderWhy").addEventListener("click", () => {
+        const box = document.getElementById("orderWhyBox");
+        box.hidden = false;
+        box.innerHTML = ORDER_GAMES[orderGameId].why;
+      });
+      function stopOrderTimer() {
+        if (orderTimer) clearInterval(orderTimer);
+        orderTimer = null;
+        document.getElementById("orderTimerLabel").textContent = "";
+      }
+      document.getElementById("orderTimer").addEventListener("click", () => {
+        stopOrderTimer();
+        orderTimerLeft = 90;
+        document.getElementById("orderTimerLabel").textContent = "90s left — order then explain aloud";
+        orderTimer = setInterval(() => {
+          orderTimerLeft -= 1;
+          if (orderTimerLeft <= 0) {
+            stopOrderTimer();
+            document.getElementById("orderTimerLabel").textContent = "Time’s up — check your order, then say your actions";
+            return;
+          }
+          document.getElementById("orderTimerLabel").textContent = orderTimerLeft + "s left — order then explain aloud";
+        }, 1000);
+      });
+      document.getElementById("orderTimerStop").addEventListener("click", stopOrderTimer);
+      initOrderGame("morning", true);
+    })();
+
     window.__bootPractice = function () {
       if (window.__practiceBooted) return;
       window.__practiceBooted = true;
@@ -1255,7 +1483,7 @@
       renderAcronyms();
     };
     try {
-      if (sessionStorage.getItem("ivPracticeUnlocked_v1") === "1") window.__bootPractice();
+      if (sessionStorage.getItem("ivPracticeUnlocked_v2") === "1") window.__bootPractice();
     } catch (e) {}
   </script>
 </body>
